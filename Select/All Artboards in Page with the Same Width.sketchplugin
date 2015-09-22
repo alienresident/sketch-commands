@@ -1,0 +1,60 @@
+// All Artboards in Page with the Same Width (shift option command a)
+
+// For the purpose of exporting them to a single folder
+
+var current_page = [doc currentPage]
+var artboards = [current_page artboards]
+var number_artboards = [artboards count]
+
+[current_page deselectAllLayers]
+
+function createSelect(msg, items, selectedItemIndex){
+  selectedItemIndex = selectedItemIndex || 0
+
+  var accessory = [[NSComboBox alloc] initWithFrame:NSMakeRect(0,0,200,25)]
+
+  [accessory addItemsWithObjectValues:items]
+  [accessory selectItemAtIndex:selectedItemIndex]
+
+  var alert = [[NSAlert alloc] init]
+  [alert setMessageText:msg]
+  [alert addButtonWithTitle:'OK']
+  [alert addButtonWithTitle:'Cancel']
+  [alert setAccessoryView:accessory]
+
+  var responseCode = [alert runModal]
+  var sel = [accessory indexOfSelectedItem]
+  var value = [accessory objectValueOfSelectedItem]
+
+  return [responseCode, sel, value]
+}
+
+var options = [];
+
+for (var i = 0; i < number_artboards; i++) {
+	var a = artboards[i];
+	options[i] = [[a frame] width];
+
+}
+log(options);
+
+// Dedupe array — Get uniq list of artboard width
+// http://stackoverflow.com/questions/9229645/remove-duplicates-from-javascript-array
+var sortedOptions = options.reduce(function(a,b){
+    if (a.indexOf(b) < 0 ) a.push(b);
+    return a;
+  },[]);
+
+var choice = createSelect('Choose the artboard width', sortedOptions, 1);
+
+if (choice[0] == 1000) {
+
+  var loop = [artboards objectEnumerator]
+	while (artboard = loop.nextObject()) {
+	artboardWidth = artboard.frame().width();
+	if(artboardWidth == choice[2]) {
+  		[artboard select:true byExpandingSelection:true]
+  }
+}
+
+}
